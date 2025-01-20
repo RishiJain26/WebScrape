@@ -1,38 +1,65 @@
-name: Node.js Package
+# name: Node.js Package
+
+# on:
+#   push:
+#     branches: [main]
+#   pull_request:
+#     branches: [main]
+#   release:
+#     types: [created]
+
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - uses: actions/setup-node@v4
+#         with:
+#           node-version: [10.x]
+#       - run: cd frontend && npm ci   # Move to the frontend folder and install dependencies
+#       - run: cd frontend && npm test # Run tests for the React app
+
+#   publish-gpr:
+#     needs: build
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: read
+#       packages: write
+#     steps:
+#       - uses: actions/checkout@v4
+#       - uses: actions/setup-node@v4
+#         with:
+#           node-version: 10.x
+#           registry-url: https://npm.pkg.github.com/
+#       - run: cd frontend && npm ci   # Ensure dependencies are installed in the frontend folder
+#       - run: cd frontend && npm publish
+#         env:
+#           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+name: Node.js CI
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
-  release:
-    types: [created]
-
+    branches: [ main ]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: cd frontend && npm ci   # Move to the frontend folder and install dependencies
-      - run: cd frontend && npm test # Run tests for the React app
 
-  publish-gpr:
-    needs: build
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x, 14.x]
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          registry-url: https://npm.pkg.github.com/
-      - run: cd frontend && npm ci   # Ensure dependencies are installed in the frontend folder
-      - run: cd frontend && npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: cd frontend && npm ci
+    - run: cd frontend && npm run build --if-present
+    - run: cd frontend && npm test
