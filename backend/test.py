@@ -6,4 +6,4 @@ client = TestClient(app)
 def test_read_main():
     response = client.get("/")
     assert response.status_code == 200
-    assert "Python Web Scraping" in str(response.content)
+    assert "Hello World" in str(response.content)
