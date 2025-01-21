@@ -26,7 +26,13 @@ jobs:
           cd frontend
           npm install
 
-      - name: Build and start application
+      - name: Build application
         run: |
           cd frontend
-          npm start
+          npm run build
+
+      - name: Upload production build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: frontend/build
