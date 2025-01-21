@@ -1,49 +1,9 @@
-# name: Node.js Package
-
-# on:
-#   push:
-#     branches: [main]
-#   pull_request:
-#     branches: [main]
-#   release:
-#     types: [created]
-
-
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v4
-#       - uses: actions/setup-node@v4
-#         with:
-#           node-version: [10.x]
-#       - run: cd frontend && npm ci   # Move to the frontend folder and install dependencies
-#       - run: cd frontend && npm test # Run tests for the React app
-
-#   publish-gpr:
-#     needs: build
-#     runs-on: ubuntu-latest
-#     permissions:
-#       contents: read
-#       packages: write
-#     steps:
-#       - uses: actions/checkout@v4
-#       - uses: actions/setup-node@v4
-#         with:
-#           node-version: 10.x
-#           registry-url: https://npm.pkg.github.com/
-#       - run: cd frontend && npm ci   # Ensure dependencies are installed in the frontend folder
-#       - run: cd frontend && npm publish
-#         env:
-          # NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
 name: Node.js CI
 
 on:
   push:
     branches:
       - main
-      - '**'
   pull_request:
     branches:
       - main
@@ -53,20 +13,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: List JS/JSX files
-        run: ls -R frontend || echo "No files found in client directory"
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '22' # Specify your Node.js version here
 
       - name: Install dependencies
-        run: npm install
-        working-directory: frontend
+        run: |
+          cd frontend
+          npm install
 
-      - name: Run npm-publish-github-packages check
-        run: npx npm-publish-github-packages --check "frontend/**/*.{js,jsx}"
+      - name: Build and start application
+        run: |
+          cd frontend
+          npm start
